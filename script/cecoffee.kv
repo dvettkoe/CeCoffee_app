@@ -1,0 +1,714 @@
+WindowManager:
+    id: screen_manager
+    MainWindow:
+	    name: "main_window"
+    MenuWindow:
+	    name: "menu_window"
+	UserWindow:
+	    name: "user_window"
+	PayWindow:
+	    name: "pay_window"
+    AdminWindow:
+        name: "admin_window"
+    DataTable:
+        name: "data_window"
+    GraphWindow:
+        name: "graph_window"
+    RankingWindow:
+        name: "ranking_window"
+
+#: set s dp(100)
+#: set f "Cardinal.ttf"
+#: import Clock kivy.clock.Clock
+#: import QRCodeWidget kivy_garden.qrcode
+
+<MainWindow>:
+    id: main
+
+
+
+<UserWindow>:
+    RelativeLayout:
+        Label:
+            id: user_name
+            text: "Welcome, " + root.username + "!"
+            font_size: "25dp"
+            color: 202/255, 158/255, 103/255, 1
+            pos_hint: {"center_x": 0.2, "center_y": 0.9}
+
+        Label:
+            id: date
+            text: root.current_day + ". " + root.date
+            font_size: "18dp"
+            color: 202/255, 158/255, 103/255, 1
+            pos_hint: {"center_x": 0.82, "center_y": 0.92}
+
+        Widget:
+            pos_hint: {"center_x": 0.25, "center_y": 0.58}
+            size_hint: 0.2, 0.4
+            canvas:
+                Color:
+                    rgba: 202/255, 158/255, 103/255, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+
+        BoxLayout:
+            orientation: "vertical"
+            pos_hint: {"center_x": 0.25, "center_y": 0.58}
+            size_hint: 0.2, 0.4
+            padding_vertical: "15dp"
+            Label:
+                text: "You've had"
+                font_size: "20dp"
+                text_size: self.size
+                halign: 'center'
+                valign: 'middle'
+                color: 104/255,60/255,17/255,1
+            Label:
+                text: str(root.counts)
+                font_size: "50dp"
+                text_size: self.size
+                halign: 'center'
+                valign: 'middle'
+                color: 104/255,60/255,17/255,1
+            Label:
+                text: "cups of coffee."
+                font_size: "20dp"
+                text_size: self.size
+                halign: 'center'
+                valign: 'middle'
+                color: 104/255,60/255,17/255,1
+
+        Label:
+            id: warning
+            text: root.user_warning
+            color: 1, 0, 0, 1
+            font_size: "20dp"
+            pos_hint: {"center_x": 0.35, "center_y": 0.83}
+
+        Button:
+            id: plus_coffee
+            size_hint: None, None
+            background_normal: "images/coffee.png"
+            background_down: "images/coffee_p.png"
+            border: 0,0,0,0
+            width: "100dp"
+            height: "100dp"
+            pos_hint: {"center_x": 0.5, "center_y": 0.63}
+            on_press:
+                root.add_coffee()
+                root.get_quote()
+        Button:
+            id: minus_cof
+            text: "-"
+            color: 104/255,60/255,17/255,1
+            font_size: "30dp"
+            size_hint: None, None
+            background_normal: "images/button.png"
+            background_down: "images/button_p.png"
+            border: 0,0,0,0
+            width: "60dp"
+            height: "30dp"
+            pos_hint: {"center_x": 0.5, "center_y": 0.43}
+            on_press:   root.minus_coffee()
+
+        Button:
+            id: pay
+            size_hint: None, None
+            background_normal: "images/pay.png"
+            background_down: "images/pay_p.png"
+            background_disabled_normal: "images/pay_d.png"
+            border: 0,0,0,0
+            width: "80dp"
+            height: "80dp"
+            pos_hint: {"center_x": 0.8, "center_y": 0.72}
+            on_release:
+                root.check_enable()
+                app.root.current = "pay_window"
+            disabled: True
+
+        Spinner:
+            id: history_spinner
+            text: "payment history"
+            dropdown_cls: 'MyDropDown'
+            values: root.pay_history_list
+            background_normal: "images/button.png"
+            border: 0,0,0,0
+            color: 104/255,60/255,17/255,1
+            size_hint: None, None
+            size: "150dp","30dp"
+            pos_hint: {"center_x": 0.805, "center_y": 0.56}
+
+        Button:
+            id: to_graph
+            size_hint: None, None
+            background_normal: "images/stats.png"
+            background_down: "images/stats_p.png"
+            border: 0,0,0,0
+            width: "60dp"
+            height: "60dp"
+            pos_hint: {"center_x": 0.75, "center_y": 0.42}
+            on_press: app.root.current = "graph_window"
+        Button:
+            id: to_rank
+            size_hint: None, None
+            background_normal: "images/ranks.png"
+            background_down: "images/ranks_p.png"
+            border: 0,0,0,0
+            width: "60dp"
+            height: "60dp"
+            pos_hint: {"center_x": 0.86, "center_y": 0.42}
+            on_press: app.root.current = "ranking_window"
+
+        Button:
+            id: back
+            size_hint: None, None
+            background_normal: "images/back.png"
+            background_down: "images/back_p.png"
+            border: 0,0,0,0
+            width: "40dp"
+            height: "30dp"
+            pos_hint: {"center_x": 0.05, "center_y": 0.08}
+            on_press:
+                app.root.current = "main_window"
+                root.manager.transition.direction = "right"
+
+        Label:
+            text: "Wisdom of the cup:"
+            font_size: "17dp"
+            color: 202/255, 158/255, 103/255, 1
+            pos_hint: {"center_x": 0.185, "center_y": 0.34}
+
+        Widget:
+            pos_hint: {"center_x": 0.5, "center_y": 0.2}
+            size_hint: 0.83, 0.23
+            canvas:
+                Color:
+                    rgba: 202/255, 158/255, 103/255, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+
+        Widget:
+            pos_hint: {"center_x": 0.5, "center_y": 0.2}
+            size_hint: 0.81, 0.21
+            canvas:
+                Color:
+                    rgba: 104/255,60/255,17/255,1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+
+        Widget:
+            pos_hint: {"center_x": 0.5, "center_y": 0.2}
+            size_hint: 0.8, 0.2
+            canvas:
+                Color:
+                    rgba: 202/255, 158/255, 103/255, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+
+        BoxLayout:
+            pos_hint: {"center_x": 0.5, "center_y": 0.2}
+            size_hint: 0.8, 0.2
+            padding_vertical: "30dp"
+            Label:
+                id: quote
+                text: root.quote_input
+                #font_name: f
+                font_size: "25dp"
+                text_size: self.size
+                halign: 'center'
+                valign: 'middle'
+                color: 104/255,60/255,17/255,1
+
+<MyDropDown@DropDown>:
+    max_height: 100
+
+<PayWindow>:
+    RelativeLayout:
+        Label:
+            text: "Checkout"
+            font_size: "30dp"
+            color: .79,.62,.4,1
+            pos_hint: {"center_x": 0.5, "center_y": 0.9}
+
+        Button:
+            id: exit_pay
+            text: "X"
+            color: 104/255,60/255,17/255,1
+            font_size: "21dp"
+            size_hint: None, None
+            background_normal: "images/button_x.png"
+            background_down: "images/button_x_p.png"
+            border: 0,0,0,0
+            width: "20dp"
+            height: "20dp"
+            pos_hint: {"center_x": 0.9, "center_y": 0.95}
+            on_press:
+                app.root.current = "user_window"
+                root.manager.transition.direction = "down"
+
+        Widget:
+            pos_hint: {"center_x": 0.25, "center_y": 0.5}
+            size_hint: 0.4, 0.56
+            canvas:
+                Color:
+                    rgba: 202/255, 158/255, 103/255, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+
+        BoxLayout:
+            orientation: "vertical"
+            pos_hint: {"center_x": 0.25, "center_y": 0.495}
+            size_hint: 0.4, 0.55
+            padding_vertical: "15dp"
+            #padding_horizontal: "15dp"
+            Label:
+                text: "You've had " + str(root.coffee_sum_lm) + " cups of coffee in " + str(root.last_month) + "."
+                font_size: "20dp"
+                text_size: self.size
+                halign: 'center'
+                valign: 'middle'
+                color: 104/255,60/255,17/255,1
+            Label:
+                text: "That will be " + str(root.amount_e) + "€"
+                font_size: "30dp"
+                text_size: self.size
+                halign: 'center'
+                valign: 'middle'
+                color: 104/255,60/255,17/255,1
+
+            Label:
+                text: "You can pay cash or send it to"
+                font_size: "20dp"
+                text_size: self.size
+                halign: 'center'
+                valign: 'middle'
+                color: 104/255,60/255,17/255,1
+            Label:
+                text: str(root.admin_username) + " via PayPal: " + str(root.paypal_mail)
+                font_size: "20dp"
+                text_size: self.size
+                halign: 'center'
+                valign: 'middle'
+                color: 104/255,60/255,17/255,1
+
+        Widget:
+            pos_hint: {"center_x": 0.75, "center_y": 0.5}
+            size_hint: 0.4, 0.56
+            canvas:
+                Color:
+                    rgba: 202/255, 158/255, 103/255, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+        Label:
+            text: "Or by scanning this QR Code:"
+            pos_hint: {"center_x": 0.75, "center_y": 0.74}
+            color: 104/255,60/255,17/255,1
+            font_size: "20dp"
+        QRCodeWidget:
+            id: qr
+            size_hint: 0.25, 0.45
+            pos_hint: {"center_x": 0.75, "center_y": 0.47}
+            show_border: False
+            data: str(root.paypal_link) + "/" + str(root.amount_e)
+        Button:
+            text: "Paid."
+            color: 104/255,60/255,17/255,1
+            font_size: "20dp"
+            background_normal: "images/button.png"
+            background_down: "images/button_p.png"
+            border: 0,0,0,0
+            size_hint: None, None
+            width: "140dp"
+            height: "30dp"
+            pos_hint: {"center_x": 0.5, "center_y": 0.1}
+            on_press: root.pay_history()
+            on_release:
+                app.root.current = "user_window"
+
+
+<MenuWindow>:
+    RelativeLayout:
+        Label:
+            text: "Options"
+            pos_hint: {"center_x": 0.5, "center_y": 0.9}
+            font_size: "30dp"
+            color: .79,.62,.4,1
+        Label:
+            text: "User"
+            color: .79,.62,.4,1
+            font_size: "20dp"
+            pos_hint: {"center_x": 0.225, "center_y": 0.8}
+        Button:
+            id: plus_user
+            size_hint: None, None
+            background_normal: "images/adduser.png"
+            background_down: "images/adduser_p.png"
+            border: 0,0,0,0
+            width: "80dp"
+            height: "80dp"
+            pos_hint: {"center_x": 0.15, "center_y": 0.6}
+            on_release: root.create_new_user()
+
+        Button:
+            id: minus_user
+            size_hint: None, None
+            background_normal: "images/minususer.png"
+            background_down: "images/minususer_p.png"
+            border: 0,0,0,0
+            width: "80dp"
+            height: "80dp"
+            pos_hint: {"center_x": 0.3, "center_y": 0.6}
+            on_release: root.delete_user()
+
+        TextInput:
+            id: new_user
+            hint_text: "Input user name"
+            on_focus: self.focus
+            on_focus: self.select_all()
+            size_hint: 0.25, 0.1
+            pos_hint: {"center_x": 0.225, "center_y": 0.4}
+
+        Label:
+            id: not_found
+            text: ""
+            pos_hint: {"center_x": 0.25, "center_y": 0.4}
+            color: 1, 0, 0, 1
+        Label:
+            text: "Admin"
+            color: .79,.62,.4,1
+            font_size: "20dp"
+            pos_hint: {"center_x": 0.5, "center_y": 0.8}
+        Button:
+            id: table_pop_up
+            size_hint: None, None
+            background_normal: "images/table.png"
+            background_down: "images/table_p.png"
+            border: 0,0,0,0
+            width: "80dp"
+            height: "80dp"
+            pos_hint: {"center_x": 0.5, "center_y": 0.6}
+            on_press:
+                app.root.current = "data_window"
+                root.manager.transition.direction = "up"
+        Button:
+            id: admin_change_button
+            size_hint: None, None
+            background_normal: "images/admin.png"
+            background_down: "images/admin_p.png"
+            border: 0,0,0,0
+            width: "80dp"
+            height: "80dp"
+            pos_hint: {"center_x": 0.5, "center_y": 0.3}
+            on_press:
+                app.root.current = "admin_window"
+                root.manager.transition.direction = "up"
+        Label:
+            text: "Maintenance"
+            color: .79,.62,.4,1
+            font_size: "20dp"
+            pos_hint: {"center_x": 0.79, "center_y": 0.8}
+        Button:
+            id: cleaning
+            size_hint: None, None
+            background_normal: "images/clean.png"
+            background_down: "images/clean_p.png"
+            border: 0,0,0,0
+            width: "80dp"
+            height: "80dp"
+            pos_hint: {"center_x": 0.72, "center_y": 0.6}
+            on_press: root.cleaned()
+        Spinner:
+            id: clean_hist
+            text: "history"
+            dropdown_cls: 'MyDropDown'
+            values: root.cleaned_history_list
+            size_hint: None, None
+            size: "90dp","30dp"
+            background_normal: "images/button.png"
+            border: 0,0,0,0
+            color: 104/255,60/255,17/255,1
+            pos_hint: {"center_x": 0.72, "center_y": 0.4}
+
+        Button:
+            id: refill
+            size_hint: None, None
+            background_normal: "images/bean.png"
+            background_down: "images/bean_p.png"
+            border: 0,0,0,0
+            width: "80dp"
+            height: "80dp"
+            pos_hint: {"center_x": 0.87, "center_y": 0.6}
+            on_press: root.refilled()
+        Spinner:
+            id: refill_hist
+            text: "history"
+            dropdown_cls: 'MyDropDown'
+            values: root.refilled_history_list
+            size_hint: None, None
+            size: "90dp","30dp"
+            background_normal: "images/button.png"
+            border: 0,0,0,0
+            color: 104/255,60/255,17/255,1
+            pos_hint: {"center_x": 0.87, "center_y": 0.4}
+        Button:
+            id: home
+            size_hint: None, None
+            background_normal: "images/back.png"
+            background_down: "images/back_p.png"
+            border: 0,0,0,0
+            width: "40dp"
+            height: "30dp"
+            pos_hint: {"center_x": 0.1, "center_y": 0.1}
+            on_press:
+                app.root.current = "main_window"
+                root.manager.transition.direction = "down"
+
+        Button:
+            id: data_export
+            text: "prepare update"
+            color: 104/255,60/255,17/255,1
+            size_hint: None, None
+            background_normal: "images/button.png"
+            background_down: "images/button_p.png"
+            border: 0,0,0,0
+            width: "110dp"
+            height: "30dp"
+            pos_hint: {"center_x": 0.8, "center_y": 0.28}
+            on_press: root.export_data()
+
+<AdminWindow>
+    RelativeLayout:
+        Label:
+            text: "Admin settings"
+            pos_hint: {"center_x": 0.5, "center_y": 0.9}
+            font_size: "30dp"
+            color: .79,.62,.4,1
+        Button:
+            id: back2settings
+            text: "X"
+            color: 104/255,60/255,17/255,1
+            font_size: "21dp"
+            size_hint: None, None
+            background_normal: "images/button_x.png"
+            background_down: "images/button_x_p.png"
+            border: 0,0,0,0
+            width: "20dp"
+            height: "20dp"
+            pos_hint: {"center_x": 0.9, "center_y": 0.9}
+            on_press:
+                app.root.current = "menu_window"
+                root.manager.transition.direction = "down"
+
+        BoxLayout:
+            id: admin_box
+            size_hint: 0.95,0.8
+            pos_hint: {"center_x": 0.5, "center_y": 0.45}
+            orientation: "vertical"
+            Label:
+
+            BoxLayout:
+                orientation: "horizontal"
+                Label:
+                    text: "Change Admin Name:"
+                    color: .79,.62,.4,1
+                    font_size: "20dp"
+                TextInput:
+                    id: admin_name
+                    hint_text: "Input new admin name"
+                Label:
+                    size_hint: 0.1, 0.1
+            Label:
+                size_hint: 0.3, 0.3
+            BoxLayout:
+                orientation: "horizontal"
+                Label:
+                    text: "Change Admin's PayPal E-Mail:"
+                    color: .79,.62,.4,1
+                    font_size: "20dp"
+                TextInput:
+                    id: admin_mail
+                    hint_text: "Input new PayPal e-mail address"
+                Label:
+                    size_hint: 0.1, 0.1
+            Label:
+                size_hint: 0.3, 0.3
+            BoxLayout:
+                orientation: "horizontal"
+                Label:
+                    text: "Change PayPal link"
+                    color: .79,.62,.4,1
+                    font_size: "20dp"
+                TextInput:
+                    id: admin_link
+                    hint_text: "Input new paypal.me link"
+                Label:
+                    size_hint: 0.1, 0.1
+            Label:
+                size_hint: 0.3, 0.3
+            BoxLayout:
+                orientation: "horizontal"
+                Label:
+                    text: "Coffee Price"
+                    color: .79,.62,.4,1
+                    font_size: "20dp"
+                TextInput:
+                    id: price
+                    hint_text: "Input coffee price in cents (15)"
+                    size_hint: 0.5, 1
+                Label:
+                    text: "[ct]"
+                    color: .79,.62,.4,1
+                    font_size: "20dp"
+                    size_hint: 0.3, 1
+                Label:
+                    size_hint: 0.3, 0.5
+            Label:
+                size_hint: 0.3, 0.3
+            BoxLayout:
+                orientation: "horizontal"
+                Label:
+                    text: "Insert Admin password"
+                    color: .79,.62,.4,1
+                    font_size: "20dp"
+                TextInput:
+                    id: admin_pw
+                    password: True
+                    hint_text: "Verify changes with your password"
+                Label:
+                    size_hint: 0.1, 0.1
+            Label:
+                id: wrong_pw
+                text: ""
+                color: 1, 0, 0, 1
+                font_size: "20dp"
+            BoxLayout:
+                orientation: "horizontal"
+                Label:
+                Button:
+                    id: change_admin_settings
+                    text: "Apply changes"
+                    color: 104/255,60/255,17/255,1
+                    font_size: "20dp"
+                    background_normal: "images/button.png"
+                    background_down: "images/button_p.png"
+                    border: 0,0,0,0
+                    size_hint: None, None
+                    width: "140dp"
+                    height: "30dp"
+                    on_press: root.change_config()
+                    on_release: root.save_config()
+                Label:
+<GraphWindow>:
+    RelativeLayout:
+        Label:
+            text: "Your coffee consume in " + root.year
+            pos_hint: {"center_x": 0.5, "center_y": 0.95}
+            color: .79,.62,.4,1
+            font_size: "20dp"
+        Button:
+            id: exit_graph
+            text: "X"
+            color: 104/255,60/255,17/255,1
+            font_size: "21dp"
+            size_hint: None, None
+            background_normal: "images/button_x.png"
+            background_down: "images/button_x_p.png"
+            border: 0,0,0,0
+            width: "20dp"
+            height: "20dp"
+            pos_hint: {"center_x": 0.9, "center_y": 0.95}
+            on_press:
+                app.root.current = "user_window"
+                root.manager.transition.direction = "down"
+
+        BoxLayout:
+            id: graph_box
+            size_hint: 0.95, 0.90
+            pos_hint: {"center_x": 0.5, "center_y": 0.45}
+
+<RankingWindow>:
+    RelativeLayout:
+        Label:
+            text: "Coffee Ranking " + root.year
+            pos_hint: {"center_x": 0.5, "center_y": 0.95}
+            color: .79,.62,.4,1
+            font_size: "20dp"
+        Button:
+            id: exit_ranking
+            text: "X"
+            color: 104/255,60/255,17/255,1
+            font_size: "21dp"
+            size_hint: None, None
+            background_normal: "images/button_x.png"
+            background_down: "images/button_x_p.png"
+            border: 0,0,0,0
+            width: "20dp"
+            height: "20dp"
+            pos_hint: {"center_x": 0.9, "center_y": 0.95}
+            on_press:
+                app.root.current = "user_window"
+                root.manager.transition.direction = "down"
+
+        BoxLayout:
+            id: ranking_box
+            size_hint: 0.95, 0.90
+            pos_hint: {"center_x": 0.5, "center_y": 0.45}
+
+
+<DataTable>:
+    RelativeLayout:
+        Label:
+            text: "Overview"
+            pos_hint: {"center_x": 0.5, "center_y": 0.9}
+            color: .79,.62,.4,1
+            font_size: "20dp"
+        Button:
+            id: ex
+            text: "X"
+            color: 104/255,60/255,17/255,1
+            font_size: "21dp"
+            size_hint: None, None
+            background_normal: "images/button_x.png"
+            background_down: "images/button_x_p.png"
+            border: 0,0,0,0
+            width: "20dp"
+            height: "20dp"
+            pos_hint: {"center_x": 0.9, "center_y": 0.9}
+            on_press:
+                app.root.current = "menu_window"
+                root.manager.transition.direction = "down"
+
+        BoxLayout:
+            id: table_box
+            size_hint: 0.95,0.8
+            pos_hint: {"center_x": 0.5, "center_y": 0.45}
+            RecycleView:
+                viewclass: 'CustomLabel'
+                id: table_floor
+                RecycleGridLayout:
+                    id: table_floor_layout
+                    cols: 5
+                    default_size: (120,None)
+                    default_size_hint: (None,1)
+                    size_hint_y: None
+                    size_hint_x: None
+                    height: self.minimum_height
+                    width: self.minimum_width
+                    spacing: 2
+
+<CustomLabel@Label>:
+    color: 104/255,60/255,17/255,1
+    bcolor: (1,1,1,1)
+    canvas.before:
+        Color:
+            rgba: root.bcolor
+        Rectangle:
+            size: self.size
+            pos: self.pos
