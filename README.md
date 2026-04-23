@@ -1,4 +1,4 @@
-# CeCoffee_app
+# CeCoffee App
 
 ![](/script/logo.png)
 
