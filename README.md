@@ -13,7 +13,7 @@ The application monitors individual coffee intake, features an office-wide leade
 ## Getting Started
 
 ### Installation
-Download the [latest release]() and install the application on a dedicated Android device stationed near your office coffee machine.
+Download the [latest release](https://github.com/dvettkoe/CeCoffee_app/releases/tag/v1.5.0) and install the application on a dedicated Android device stationed near your office coffee machine.
 
 ---
 
